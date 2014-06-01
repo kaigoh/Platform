@@ -1,39 +1,6 @@
 <?php
 
 	/**
-	 * Base controller class
-	*/
-	class platformController {
-		
-		private $_getParams = null;
-	    private $_pageName = null;
-	    private $_pageExtension = null;
-	    
-	    public function _pageSetup($pageName, $pageExtension, $getParams)
-	    {
-	        $this->_pageName = $pageName;
-	        $this->_pageExtension = $pageExtension;
-	        $this->_getParams = $getParams;
-	    }
-	    
-	    private function getParams($param = false)
-		{
-		    if(is_array($this->_getParams))
-		    {
-	    		if($param === false)
-	    		{
-	    			return $this->_getParams;
-	    		} else {
-	    			return $this->_getParams[$param];
-	    		}
-		    } else {
-		        return false;
-		    }
-		}
-		
-	}
-
-	/**
 	 * Routing
 	*/
 	
@@ -121,14 +88,9 @@
 			$controllerName = $route["controller"];
 			$pageName = $route["function"];
 			$pageExtension = $route["extension"];
-			$controller = new $controllerName;
+			$controller = new $controllerName($pageName, $pageExtension);
 			if(method_exists($controller, $pageName))
 			{
-				// Set the page up with basic data
-				if(method_exists($controller, "_pageSetup"))
-				{
-					$controller->_pageSetup($pageName, $pageExtension, $getParams);	
-				}
 				$controller->$pageName();
 			} else {
 				return false;
@@ -136,4 +98,20 @@
 		} else {
 			return false;
 		}
+	}
+	
+	/**
+	 * Base controller class
+	*/
+	class platformController {
+		
+	    protected $_pageName = null;
+	    protected $_pageExtension = null;
+	    
+	    function __construct($pageName, $pageExtension)
+	    {
+	        $this->_pageName = $pageName;
+	        $this->_pageExtension = $pageExtension;
+	    }
+		
 	}
