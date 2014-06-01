@@ -1,0 +1,10 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    ## Uncomment and update the path if Genghis is not in your web root.
+    # RewriteBase /genghis
+
+    ## Use pretty URLs
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule (.*) index.php?$1 [L,QSA]
+</IfModule>
