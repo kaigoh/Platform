@@ -25,33 +25,16 @@
     
 */
 
-require("platform.inc.php");
-
-/**
- * This will create a basic Platform App.
- * You can override the default route
- * and the error routes by passing them as
- * parameters to the constructor, as below,
- * or you can not pass them to use the default
- * routes.
- */
- 
- /**
-  * Routes are stored as arrays.
-  * controller: Specifies the class to load
-  * function: Specifies the method (or "page")
-  * extension: Specifies the extension (ie. JSON) - Can be null
-  */
- $defaultRoute = array(
-	"controller" => "defaultRoutes",
-	"function" => "index",
-	"extension" => null,
-);
+class defaultRoutes extends platformController {
 	
-$errorRoute = array(
-	"controller" => "defaultRoutes",
-	"function" => "error404",
-	"extension" => null,
-);
- 
-$platformApp = new platformApp($defaultRoute, $errorRoute);
+	public function index()
+	{
+	    echo "Nowt ta see 'ere...";
+	}
+	
+	public function error404()
+	{
+	    echo "Page not found :(";
+	}
+    
+}
