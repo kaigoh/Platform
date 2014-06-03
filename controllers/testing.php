@@ -122,7 +122,7 @@ class testing extends platformController {
      */
     public function burgerJSON()
     {
-        echo json_encode(array("method" => strtolower($this->_pageRequestMethod), "document" => "json", "verycool" => true));
+        echo json_encode(array("method" => strtolower($this->pageRequestMethod), "document" => "json", "verycool" => true));
     }
     
     /**
