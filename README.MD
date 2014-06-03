@@ -12,7 +12,7 @@ Installation
 ---
 
 ```sh
-git clone https://kaigoh@bitbucket.org/kaigoh/platform.git platform
+git clone https://@bitbucket.org/kaigoh/platform.git platform
 ```
 
 Usage
