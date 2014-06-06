@@ -2,19 +2,19 @@
 /**
 
     The MIT License (MIT)
-    
+
     Copyright (c) 2014, Kai Gohegan
-    
+
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
     in the Software without restriction, including without limitation the rights
     to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
     copies of the Software, and to permit persons to whom the Software is
     furnished to do so, subject to the following conditions:
-    
+
     The above copyright notice and this permission notice shall be included in all
     copies or substantial portions of the Software.
-    
+
     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -22,11 +22,11 @@
     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
-    
+
 */
 
 class testing extends platformController {
-	
+
 	/**
 	 * You MUST include an "index" function in your
 	 * classes. This way the router can find something
@@ -36,7 +36,7 @@ class testing extends platformController {
 	{
 	    var_dump($this->urlSegments);
 	}
-    
+
     /**
      * This is an example of the most basic
      * page handler. It will be accessible
@@ -67,7 +67,7 @@ class testing extends platformController {
                 break;
         }
     }
-    
+
     /**
      * File handler for "ASP" extensions
      * (When creating your own "file"
@@ -80,7 +80,7 @@ class testing extends platformController {
         // LOL
         header("X-Powered-By: ASP.NET");
     }
-    
+
     /**
      * This method is called if
      * the file extension is asp
@@ -89,7 +89,7 @@ class testing extends platformController {
     {
         echo "Haha, not really!";
     }
-    
+
     /**
      * This method would be called
      * if the server received a post
@@ -99,7 +99,7 @@ class testing extends platformController {
     {
         echo "You made a POST request!";
     }
-    
+
     /**
      * This method would be called
      * if the server received a post
@@ -109,12 +109,12 @@ class testing extends platformController {
      * (See handlerASP()
      * for an example that you can override
      * in your controllers)
-     */    
+     */
     public function postBurgerJSON()
     {
         echo json_encode(array("method" => "post", "document" => "json", "verycool" => true));
     }
-    
+
     /**
      * Similar to the above method,
      * but will respond to ANY method
@@ -124,7 +124,7 @@ class testing extends platformController {
     {
         echo json_encode(array("method" => strtolower($this->pageRequestMethod), "document" => "json", "verycool" => true));
     }
-    
+
     /**
      * This method would be called
      * if the server received a put
@@ -134,5 +134,21 @@ class testing extends platformController {
     {
         echo "You made a PUT request!";
     }
-    
+
+	/**
+	 * Testing custom routes
+	 */
+    public function echourl()
+	{
+		echo $this->rawRequest." was routed to testing/echourl!";
+	}
+
+	/**
+	 * Advanced custom routes
+	 */
+	public function jamJSON()
+	{
+		echo json_encode(array("flavour" => str_replace("jam/flavour.json", "", $this->rawRequest)));
+	}
+
 }
