@@ -1,7 +1,7 @@
 Platform
 ========
 
-Platform is a tiny (and simple) PHP router. It is designed to be a platform to build your PHP applications upon.
+Platform is a small and simple PHP framework. It is designed to be a platform to build your PHP applications upon.
 
 Version
 ---
