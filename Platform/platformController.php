@@ -25,27 +25,56 @@
 
 */
 
-use Platform;
+namespace Platform;
 
-class database extends Platform\platformController {
+/**
+ * Base Controller class
+*/
+class platformController {
 
-	public function index()
+	protected $rawRequest = null;
+	protected $urlSegments = array();
+	protected $pageRequestMethod = null;
+	protected $pageName = null;
+	protected $pageExtension = null;
+
+	// Autoloader
+	protected $_libraryLoader = null;
+
+	function __construct($requestRaw, $urlSegments, $pageRequestMethod, $pageName, $pageExtension)
 	{
-		$database = new Platform\platformDatabase("mysql:dbname=;host=", "username", "password");
-		$table = $database->cb_config;
-		if($table !== false)
+	    $this->rawRequest = $requestRaw;
+	    $this->urlSegments = $urlSegments;
+		$this->pageRequestMethod = $pageRequestMethod;
+		$this->pageName = $pageName;
+		$this->pageExtension = $pageExtension;
+
+		// Composer auto loader
+		if(file_exists("../vendor/autoload.php"))
 		{
-
-			$table->where("name", "LIKE", "s%");
-			$row = $table->get();
-
-			echo $table->totalRows();
-
-			//var_dump($row);
-
+		    $this->_libraryLoader = require("../vendor/autoload.php");
 		} else {
-			echo "Table doesn't exist!";
+		    $this->_libraryLoader = false;
 		}
+
+	}
+
+	// File-type handler - JavaScript
+	public function handlerJS()
+	{
+		header("Content-Type: application/javascript");
+	}
+
+	// File-type handler - JSON
+	public function handlerJSON()
+	{
+		header("Content-Type: application/json");
+	}
+
+	// File-type handler - PDF
+	public function handlerPDF()
+	{
+		header("Content-Type: application/pdf");
 	}
 
 }

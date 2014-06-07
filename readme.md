@@ -19,7 +19,8 @@ Usage
 ---
 
 ```php
-$platformApp = new platformApp();
+require("Platform.php");
+$platformApp = new RTS\Platform\Framework\platformApp();
 ```
 
 Routing

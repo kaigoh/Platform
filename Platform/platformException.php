@@ -25,27 +25,12 @@
 
 */
 
-use Platform;
+namespace RTS\Platform\Exception;
 
-class database extends Platform\platformController {
-
-	public function index()
-	{
-		$database = new Platform\platformDatabase("mysql:dbname=;host=", "username", "password");
-		$table = $database->cb_config;
-		if($table !== false)
-		{
-
-			$table->where("name", "LIKE", "s%");
-			$row = $table->get();
-
-			echo $table->totalRows();
-
-			//var_dump($row);
-
-		} else {
-			echo "Table doesn't exist!";
-		}
-	}
-
+/**
+ * Exception class
+ */
+class platformException extends Exception
+{
+	// ToDo
 }

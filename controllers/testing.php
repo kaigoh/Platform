@@ -25,6 +25,8 @@
 
 */
 
+use Platform;
+
 class testing extends platformController {
 
 	/**

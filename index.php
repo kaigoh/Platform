@@ -25,7 +25,7 @@
 
 */
 
-require("platform.inc.php");
+require("Platform.php");
 
 /**
  * This will create a basic Platform App.
@@ -55,7 +55,7 @@ $errorRoute = array(
 );
 
 // Instantiate Platform
-$platformApp = new platformApp($defaultRoute, $errorRoute);
+$platformApp = new Platform\platformApp($defaultRoute, $errorRoute);
 
 /**
  * Add any custom routes you need BEFORE running your application...
