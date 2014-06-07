@@ -37,14 +37,21 @@ class platformRow {
 	private $_tableColumns = false;
 	private $_rowData = array();
 	private $_rowDataOriginal = array();
+	private $_newRow = false;
 
-	function __construct($platformDatabase = false, $platformTable = false)
+	function __construct($platformDatabase = false, $platformTable = false, $newRow = false)
 	{
 		if($platformDatabase !== false && $platformTable !== false)
 		{
 			$this->_database = $platformDatabase;
 			$this->_table = $platformTable;
 			$this->_tableColumns = $this->_table->getColumns();
+			if($newRow)
+			{
+				$this->_newRow = $newRow;
+			}
+		} else {
+			throw new platformException("Unable to create platformRow object");
 		}
 	}
 
@@ -58,11 +65,11 @@ class platformRow {
 			$this->_rowDataOriginal[$columnName] = $columnValue;
 			$this->_rowData[$columnName] = $columnValue;
 		} else {
-			if(array_key_exists($columnName, $this->_tableColumns))
+			if(in_array($columnName, $this->_tableColumns))
 			{
 				$this->_rowData[$columnName] = $columnValue;
 			} else {
-				throw new platformException("Column you are trying to set does not exist in ".$this->_table->getTableName()." table.");
+				throw new platformException("Column you are trying to set (".$columnName.") does not exist in ".$this->_table->getTableName()." table.");
 			}
 		}
 	}
@@ -155,6 +162,32 @@ class platformRow {
 			}
 		} else {
 			return false;
+		}
+	}
+
+	/**
+	 * Is this a new row that is ready to be
+	 * inserted? Also, once the row has been
+	 * inserted, allows the platformTable
+	 * class to toggle the platformRow status
+	 * and update the primary key based on
+	 * the insert ID.
+	 */
+	public function isNewRow($newRow = false)
+	{
+		if($newRow === false)
+		{
+			return $this->_newRow;
+		} else {
+			if(is_array($newRow))
+			{
+				if($this->_table->getPrimaryKey() !== false)
+				{
+					$primaryKey = $newRow["column"];
+					$this->$primaryKey = $newRow["value"];
+				}
+				$this->_newRow = false;
+			}
 		}
 	}
 

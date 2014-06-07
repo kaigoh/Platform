@@ -31,17 +31,19 @@ class database extends Platform\platformController {
 
 	public function index()
 	{
-		$database = new Platform\platformDatabase("mysql:dbname=;host=", "username", "password");
+		$database = new Platform\platformDatabase("mysql:dbname=;host=;", "user", "password");
 		$table = $database->cb_config;
 		if($table !== false)
 		{
 
-			$table->where("name", "LIKE", "s%");
-			$row = $table->get();
+			$newRow = $table->newRow();
 
-			echo $table->totalRows();
+			$newRow->name = "testing";
+			$newRow->value = "propa-testing";
 
-			//var_dump($row);
+			$table->saveRow($newRow);
+
+			var_dump($newRow);
 
 		} else {
 			echo "Table doesn't exist!";

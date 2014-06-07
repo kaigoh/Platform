@@ -25,12 +25,12 @@
 
 */
 
-namespace RTS\Platform\Exception;
+namespace Platform;
 
 /**
  * Exception class
  */
-class platformException extends Exception
+class platformException extends \Exception
 {
 	// ToDo
 }

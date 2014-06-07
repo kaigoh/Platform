@@ -59,6 +59,27 @@ class platformTable {
 	}
 
 	/**
+	 * `Magic` method - Attempts to return the
+	 * table row that has the primary key supplied,
+	 * ie. $table->pk1 would try and return the row whose
+	 * primary key column has a value of 1. **NOTE** Because
+	 * PHP variables cannot start with an integer, you must
+	 * prefix the primaryu key value with "pk" (ie. pRIMARY kEY)
+	 */
+	function __get($primaryKey = false)
+	{
+		if($this->_primaryKey !== false && substr($primaryKey, 0, 2) == "pk")
+		{
+			$primaryKey = substr($primaryKey, 2);
+			$sql = $this->_database->prepareAndExecuteSQL("SELECT * FROM `".$this->_table."` WHERE ".$this->_primaryKey." = :bind".$this->_primaryKey, array(":bind".$this->_primaryKey => $primaryKey));
+			$this->_lastQuery = $sql;
+			return $sql->fetchObject("Platform\\platformRow", array($this->_database, $this));
+		} else {
+			return false;
+		}
+	}
+
+	/**
 	 * Gets the database object
 	 */
 	public function getDatabase()
@@ -106,6 +127,7 @@ class platformTable {
 		$columns = $this->_database->executeSQLQuery("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = ".$this->_database->escapeString($this->_table));
 		if($columns !== false)
 		{
+			$this->_columns = array();
 			while($column = $columns->fetch(\PDO::FETCH_ASSOC, \PDO::FETCH_ORI_NEXT))
 			{
 				// Check for primary key column
@@ -145,6 +167,21 @@ class platformTable {
 	}
 
 	/**
+	 * New row - Returns a platformRow object
+	 * that can be inserted using the saveRow()
+	 * function.
+	 */
+	public function newRow()
+	{
+		$newRow = new platformRow($this->_database, $this, true);
+		foreach($this->_columns as $column)
+		{
+			$newRow->$column = null;
+		}
+		return $newRow;
+	}
+
+	/**
 	 * Save row - This method checks that
 	 * the columns exist in the table before
 	 * attempting to update the row
@@ -156,39 +193,52 @@ class platformTable {
 			// Fetch the data from the row
 			$rowArray = $row->getArray();
 			$rowOriginal = $row->getOriginal();
-			// Find the fields that are different
-			$updatedFields = array();
-			foreach($rowArray as $column => $data)
+			// Is this a new row, or one that needs updating?
+			if($row->isNewRow() === true)
 			{
-				if(array_key_exists($column, $rowOriginal) && $data !== $rowOriginal[$column])
+				if($this->_database->insertRow($this->getTableName(), $rowArray) > 0)
 				{
-					$updatedFields[$column] = $data;
-				}
-			}
-			// Only bother with the query if
-			// any fields have actually changed
-			if(count($updatedFields) > 0)
-			{
-				// If the table has a primary key, use it in the query.
-				// if not, fall back to a different method
-				if($this->getPrimaryKey())
-				{
-					if($this->_database->updateTable($this->getTableName(), array($this->getPrimaryKey() => $rowArray[$this->getPrimaryKey()]), $updatedFields) > 0)
-					{
-						return true;
-					} else {
-						return false;
-					}
+					// Update the row accordingly
+					$row->isNewRow(array("column" => $this->getPrimaryKey(), "value" => $this->_database->lastInsertID()));
+					return true;
 				} else {
-					if($this->_database->updateTable($this->getTableName(), $rowOriginal, $updatedFields) > 0)
-					{
-						return true;
-					} else {
-						return false;
-					}
+					return false;
 				}
 			} else {
-				return false;
+				// Find the fields that are different
+				$updatedFields = array();
+				foreach($rowArray as $column => $data)
+				{
+					if(array_key_exists($column, $rowOriginal) && $data !== $rowOriginal[$column])
+					{
+						$updatedFields[$column] = $data;
+					}
+				}
+				// Only bother with the query if
+				// any fields have actually changed
+				if(count($updatedFields) > 0)
+				{
+					// If the table has a primary key, use it in the query.
+					// if not, fall back to a different method
+					if($this->getPrimaryKey())
+					{
+						if($this->_database->updateTable($this->getTableName(), array($this->getPrimaryKey() => $rowArray[$this->getPrimaryKey()]), $updatedFields) > 0)
+						{
+							return true;
+						} else {
+							return false;
+						}
+					} else {
+						if($this->_database->updateTable($this->getTableName(), $rowOriginal, $updatedFields) > 0)
+						{
+							return true;
+						} else {
+							return false;
+						}
+					}
+				} else {
+					return false;
+				}
 			}
 		} else {
 			throw new platformException("Cannot update row!");

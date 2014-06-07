@@ -231,6 +231,35 @@ class platformDatabase {
 	}
 
 	/**
+	 * INSERT into a table
+	 */
+	public function insertRow($table = false, $columnsValues = false)
+	{
+		if($this->_db !== null && $table !== false && $columnsValues !== false)
+		{
+			// Prepare the columns for binding
+			$columns = array();
+			$columnsClean = array();
+			foreach($columnsValues as $column => $value)
+			{
+				$columns[] = $column;
+				$columnsClean[] = ":bind".$column;
+			}
+			$sql = $this->_db->prepare("INSERT INTO ".$table." (".implode(", ", $columns).") VALUES (".implode(", ", $columnsClean).")");
+			// Bind the parameters to the query
+			$valuesClean = array();
+			foreach($columnsValues as $column => $data)
+			{
+				$valuesClean[":bind".$column] = $data;
+			}
+			$sql->execute($valuesClean);
+			return $sql->rowCount();
+		} else {
+			return false;
+		}
+	}
+
+	/**
 	 * UPDATE a table
 	 */
 	public function updateTable($table = false, $whereFields = false, $setFields = false)
@@ -247,7 +276,6 @@ class platformDatabase {
 			{
 				$whereParams[] = $column." = :".$column;
 			}
-			$sql = $this->_db->prepare("UPDATE ".$table." SET ".implode(", ", $setParams)." WHERE ".implode(" AND ", $whereParams));
 			// Bind the parameters to the query
 			$queryFields = array_merge($setFields, $whereFields);
 			$queryFieldsClean = array();
@@ -255,6 +283,7 @@ class platformDatabase {
 			{
 				$queryFieldsClean[":".$column] = $data;
 			}
+			$sql = $this->_db->prepare("UPDATE ".$table." SET ".implode(", ", $setParams)." WHERE ".implode(" AND ", $whereParams));
 			$sql->execute($queryFieldsClean);
 			return $sql->rowCount();
 		} else {

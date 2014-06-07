@@ -27,7 +27,7 @@
 
 use Platform;
 
-class defaultRoutes extends platformController {
+class defaultRoutes extends Platform\platformController {
 
 	public function index()
 	{

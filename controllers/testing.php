@@ -27,7 +27,7 @@
 
 use Platform;
 
-class testing extends platformController {
+class testing extends Platform\platformController {
 
 	/**
 	 * You MUST include an "index" function in your
