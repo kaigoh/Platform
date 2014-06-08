@@ -39,7 +39,7 @@ class platformRow {
 	private $_rowDataOriginal = array();
 	private $_newRow = false;
 
-	function __construct($platformDatabase = false, $platformTable = false, $newRow = false)
+	function __construct(&$platformDatabase = false, &$platformTable = false, $newRow = false)
 	{
 		if($platformDatabase !== false && $platformTable !== false)
 		{
@@ -186,6 +186,7 @@ class platformRow {
 					$primaryKey = $newRow["column"];
 					$this->$primaryKey = $newRow["value"];
 				}
+				$this->_rowDataOriginal = $this->_rowData;
 				$this->_newRow = false;
 			}
 		}

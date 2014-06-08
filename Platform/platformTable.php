@@ -44,9 +44,10 @@ class platformTable {
 	private $_queryStartRow = false;
 	private $_queryLimit = false;
 	private $_rowCount = 0;
+	private $_joins = array();
 	private $_lastQuery = null;
 
-	function __construct($platformDatabase = false, $tableName = false)
+	function __construct(&$platformDatabase = false, $tableName = false)
 	{
 		if($pdoObject !== false && $tableName !== false)
 		{
@@ -336,7 +337,12 @@ class platformTable {
 			{
 				$limit .= ", ".$this->_queryStartRow;
 			}
-			$sql = $this->_database->prepareAndExecuteSQL("SELECT ".$this->_distinct.$selectParams." FROM `".$this->_table."` WHERE ".$whereParams.$limit, $this->_valueBindings);
+			$joins = " ";
+			if(count($this->_joins) > 0)
+			{
+				$joins .= implode(" ", $this->_joins)." ";
+			}
+			$sql = $this->_database->prepareAndExecuteSQL("SELECT ".$this->_distinct.$selectParams." FROM `".$this->_table."`".$joins."WHERE ".$whereParams.$limit, $this->_valueBindings);
 			$this->_lastQuery = $sql;
 			// Clear the query
 			$this->reset();
@@ -357,7 +363,12 @@ class platformTable {
 		{
 			$selectParams = $this->_selectParams;
 			$whereParams = implode(" AND ", $this->_whereParams);
-			$sql = $this->_database->prepareAndExecuteSQL("SELECT ".$this->_distinct.$selectParams." FROM `".$this->_table."` WHERE ".$whereParams, $this->_valueBindings);
+			$joins = " ";
+			if(count($this->_joins) > 0)
+			{
+				$joins .= implode(" ", $this->_joins)." ";
+			}
+			$sql = $this->_database->prepareAndExecuteSQL("SELECT ".$this->_distinct.$selectParams." FROM `".$this->_table."`".$joins."WHERE ".$whereParams, $this->_valueBindings);
 			$this->_lastQuery = $sql;
 			// Clear the query
 			$this->reset();
@@ -380,6 +391,7 @@ class platformTable {
 			$this->_valueBindings = array();
 			$this->_queryLimit = 1;
 			$this->_distinct = "";
+			$this->_joins = array();
 			return true;
 		} else {
 			return false;
@@ -416,8 +428,8 @@ class platformTable {
 	/**
 	 * Query building functions - where
 	 * Allows the building of the where
-	 * clause of an SQL query. Designed
-	 * to be called multiple times.
+	 * clause of an SQL query. Can
+	 * be called multiple times.
 	 */
     public function where($column = false, $operator = false, $value = false)
     {
@@ -431,6 +443,75 @@ class platformTable {
 			return false;
 		}
     }
+
+	/**
+	 * Query building functions - join
+	 * Allows JOINs to be built. Can be
+	 * called multiple times.
+	 */
+	public function join(&$joinTable = false, $joinColumns = false, $joinType = false, $returnString = false)
+	{
+		if(is_a($joinTable, "Platform\\platformTable") && is_array($joinColumns))
+		{
+			$joinColumnsClean = "";
+			foreach($joinColumns as $aColumn => $bColumn)
+			{
+				// Check if the column names
+				// have been prefixed with
+				// their table names
+				if(strpos($aColumn, ".") === false)
+				{
+					$aColumn = $this->_table.".".$aColumn;
+				}
+				if(strpos($bColumn, ".") === false)
+				{
+					$bColumn = $this->_table.".".$bColumn;
+				}
+				$joinColumnsClean[] = $aColumn." = ".$bColumn;
+			}
+			// Glue the columns together with an 'AND'
+			$joinColumnsClean = implode(" AND ", $joinColumnsClean);
+			if($joinType !== false)
+			{
+				// Add a space to the
+				// join type...
+				$joinType .= " ";
+			}
+			$joinString = $joinType."JOIN ON ".$joinColumnsClean;
+			if($returnString === true)
+			{
+				return $joinString;
+			} else {
+				$this->_joins[] = $joinString;
+				return true;
+			}
+		} else {
+			throw new platformException("Error: platformTable::join() expects the first parameter to be a platformTable object, the second parameter to be an array of coulmn names to join on (eg. acolumn => bcolumn - Note: Table names are automatically prefixed to the column names!) and an optional third parameter specifying the type of SQL JOIN.");
+		}
+	}
+
+	/**
+	 * Query building functions - join
+	 * Allows importing JOIN statements
+	 * from other platformTable objects
+	 * to allow joining on more than two
+	 * tables.
+	 */
+	public function importJOIN($sql = false)
+	{
+		if($sql !== false)
+		{
+			if(is_string($sql))
+			{
+				$this->_joins[] = $sql;
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+	}
 
 	/**
 	 * Query builder functions - limit
