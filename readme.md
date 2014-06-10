@@ -20,7 +20,7 @@ Usage
 
 ```php
 require("Platform.php");
-$platformApp = new RTS\Platform\Framework\platformApp();
+$platformApp = new Platform\platformApp();
 ```
 
 Routing
